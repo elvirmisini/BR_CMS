@@ -35,9 +35,7 @@ const update = async (id, data) => {
 };
 
 const deleteCategory = async (id) => {
-	const category = await Category.findByIdAndDelete(id).orFail(
-		new Error('Category not Found!')
-	);
+	const category = await Category.findByIdAndDelete(id).orFail();
 
 	return {
 		category,

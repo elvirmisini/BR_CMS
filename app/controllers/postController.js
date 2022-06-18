@@ -121,7 +121,6 @@ const like = async (req, res) => {
 };
 
 const deletePost = async (req, res) => {
-	console.log(req.user);
 	if (!(await postService.checkIfUserIsAuth(req.user, req.params.id))) {
 		return res.status(401).json({
 			success: false,
@@ -142,10 +141,10 @@ const deletePost = async (req, res) => {
 			},
 		});
 	} catch (e) {
-		return res.status(500).json({
+		return res.status(404).json({
 			success: false,
 			errors: {
-				msg: 'Something went wrong!',
+				msg: 'Post not found!',
 			},
 		});
 	}

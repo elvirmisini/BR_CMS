@@ -60,7 +60,7 @@ const like = async (slug) => {
 const deletePost = async (id) => {
 	const post = await Post.findOneAndDelete({
 		_id: id,
-	}).orFail(new Error('Post not Found!'));
+	}).orFail();
 
 	return {
 		post,

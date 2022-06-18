@@ -100,10 +100,10 @@ const deleteCategory = async (req, res) => {
 			},
 		});
 	} catch (e) {
-		return res.status(500).json({
+		return res.status(404).json({
 			success: false,
 			errors: {
-				msg: 'Something went wrong!',
+				msg: 'Category not found!',
 			},
 		});
 	}
