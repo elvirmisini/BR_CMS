@@ -1,14 +1,26 @@
 const router = require('express').Router();
 
 const categoryController = require('../controllers/categoryController');
-const isAdminAuthenticated = require('../middlewares/authAdmin');
+const isAuthenticated = require('./../middlewares/auth');
+const ifAdmin = require('../middlewares/authAdmin');
 
 router.get('/', categoryController.all);
-router.post('/create', isAdminAuthenticated, categoryController.create);
-router.put('/:id/edit', isAdminAuthenticated, categoryController.update);
+router.post(
+	'/create',
+	isAuthenticated,
+	ifAdmin.isAdmin,
+	categoryController.create
+);
+router.put(
+	'/:id/edit',
+	isAuthenticated,
+	ifAdmin.isAdmin,
+	categoryController.update
+);
 router.delete(
 	'/:id/delete',
-	isAdminAuthenticated,
+	isAuthenticated,
+	ifAdmin.isAdmin,
 	categoryController.deleteCategory
 );
 
