@@ -14,6 +14,10 @@ const PostSchema = new mongoose.Schema({
 		required: true,
 		ref: 'categories',
 	},
+	private: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 module.exports = mongoose.model('posts', PostSchema);

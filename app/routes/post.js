@@ -3,7 +3,7 @@ const router = require('express').Router();
 const postController = require('../controllers/postController');
 const isAuthenticated = require('./../middlewares/auth');
 
-router.get('/', postController.all);
+router.get('/', isAuthenticated, postController.all);
 router.post('/:slug/like', isAuthenticated, postController.like);
 router.post('/:slug/favorite', isAuthenticated, postController.favorite);
 router.post('/:slug/comment', isAuthenticated, postController.comment);
