@@ -4,6 +4,7 @@ module.exports = {
 	validateCreatePostInput(data) {
 		data.title =  !! data.title ? data.title : '';
 		data.description =  !! data.description ? data.description : '';
+		data.categoryId =  !! data.categoryId ? data.categoryId : '';
 
 		let errors = {};
 		
@@ -14,6 +15,10 @@ module.exports = {
 		if(Validator.isEmpty(data.description)){
 			errors.description = 'Description is required';
 		}
+		
+		if(Validator.isEmpty(data.categoryId)){
+			errors.categoryId = 'Category is required';
+		}
 
 		return {
 			errors,
@@ -22,11 +27,16 @@ module.exports = {
 	},
 	validateUpdatePostInput(data) {
 		data.description = !!data.description ? data.description : '';
+		data.categoryId = !!data.categoryId ? data.categoryId : '';
 
 		let errors = {};
 
 		if (Validator.isEmpty(data.description)) {
 			errors.description = 'Description is required';
+		}
+				
+		if (Validator.isEmpty(data.categoryId)) {
+			errors.categoryId = 'Category is required';
 		}
 
 		return {

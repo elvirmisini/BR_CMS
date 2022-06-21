@@ -1,19 +1,18 @@
 const User = require('./../models/User');
 
-const { hashPassword, createJwt } = require('./../helpers/encrypting');
+const { hashPassword, createJwt } = require('./../helpers/encrypting')
 
 const login = async (user) => {
 	const token = await createJwt({
 		id: user.id,
 		username: user.username,
 		name: `${user.firstName} ${user.lastName}`,
-		role: user.role,
 	});
 
 	return {
-		token,
-	};
-};
+		token
+	}
+}
 
 const register = async (data) => {
 	const hashedPassword = await hashPassword(data.password);
@@ -23,7 +22,6 @@ const register = async (data) => {
 		lastName: data.lastName,
 		username: data.username,
 		password: hashedPassword,
-		role: data.role,
 	}).save();
 
 	const token = await createJwt({
@@ -34,9 +32,9 @@ const register = async (data) => {
 
 	return {
 		user,
-		token,
+		token
 	};
-};
+}
 
 const changePassword = async (id, data) => {
 	const hashedPassword = await hashPassword(data.password);
@@ -61,52 +59,52 @@ const changePassword = async (id, data) => {
 };
 
 const checkUsername = async (username) => {
-	return await User.findOne({ username });
-};
+	return await User.findOne({username});
+}
 
 const getUser = async (id, returnWithPassword = false) => {
-	const user = await User.findById(id);
+	const user =  await User.findById(id)
 
-	if (returnWithPassword) {
-		return {
-			user,
-		};
+	if(returnWithPassword){
+		return { 
+			user
+		}
 	}
 
 	return {
 		user: {
-			id: user.id,
-			username: user.username,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			role: user.role,
-		},
-	};
-};
+			id : user.id,
+			username : user.username,
+			firstName : user.firstName,
+			lastName : user.lastName,
+			role : user.role,
+		}
+	}
+}
 
 const profile = async (id, data) => {
-	const user = await User.findOneAndUpdate(
-		{ id },
+	const user =  await User.findOneAndUpdate(
+		{id},
 		{
-			$set: {
+			$set:{
 				firstName: data.firstName,
 				lastName: data.lastName,
 				username: data.username,
-			},
+			}
 		},
-		{ new: true }
-	);
+		{ new : true}
+	)
 
 	return {
 		user: {
-			id: user.id,
-			username: user.username,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			role: user.role,
-		},
-	};
-};
+			id : user.id,
+			username : user.username,
+			firstName : user.firstName,
+			lastName : user.lastName,
+			role : user.role,
+		}
+	}
+}
 
 module.exports = {
 	login,

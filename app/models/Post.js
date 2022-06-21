@@ -9,7 +9,11 @@ const PostSchema = new mongoose.Schema({
 		required: true,
 		ref: 'users',
 	},
-	liked: { type: Number, default: 0 },
+	category: {
+		type: mongoose.Schema.Types.ObjectId,
+		required: true,
+		ref: 'categories',
+	},
 });
 
 module.exports = mongoose.model('posts', PostSchema);

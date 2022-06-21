@@ -9,18 +9,18 @@ const {
 } = require('../validation/user');
 
 const login = async (req, res) => {
-	const { errors, isValid } = validateLoginInput(req.body);
+	const {errors, isValid}  = validateLoginInput(req.body);
 
-	if (!isValid) {
+	if(!isValid){
 		return res.status(422).json({
 			success: false,
-			errors,
-		});
+			errors
+		})
 	}
 
 	const user = await userService.checkUsername(req.body.username);
-
-	if (!user || !(await checkPassword(req.body.password, user.password))) {
+	
+	if (!user || !await checkPassword(req.body.password, user.password)) {
 		return res.status(400).json({
 			success: false,
 			errors: {
@@ -29,63 +29,64 @@ const login = async (req, res) => {
 		});
 	}
 
-	try {
+	try{
 		const { token } = await userService.login(user);
+
 		return res.json({
 			success: true,
-			data: {
+			data : {
 				user,
-				token,
-			},
-		});
-	} catch (e) {
+				token
+			}
+		})
+	}catch(e){
 		return res.status(500).json({
-			success: false,
+			success:false,
 			errors: {
-				msg: 'Something went wrong!',
-			},
+				msg: "Something went wrong!"
+			}
 		});
 	}
-};
+} 
 
 const register = async (req, res) => {
-	const { errors, isValid } = validateRegisterInput(req.body);
+	const {errors, isValid}  = validateRegisterInput(req.body);
 
-	if (!isValid) {
+	if(!isValid){
 		return res.status(422).json({
 			success: false,
-			errors,
-		});
+			errors
+		})
 	}
 
-	if (!!(await userService.checkUsername(req.body.username))) {
+	if(!!await userService.checkUsername(req.body.username)){
 		return res.status(400).json({
 			success: false,
-			errors: {
-				username: 'Username already exists!',
-			},
+			errors : {
+				username: "Username already exists!"
+			}
 		});
 	}
 
-	try {
-		const { user, token } = await userService.register(req.body);
+	try{
+		const {user,token} = await userService.register(req.body);
 
 		return res.json({
 			success: true,
-			data: {
+			data : {
 				user,
-				token,
-			},
-		});
-	} catch (e) {
+				token
+			}
+		})
+	}catch(e){
 		return res.status(500).json({
-			success: false,
+			success:false,
 			errors: {
-				msg: 'Something went wrong!',
-			},
+				msg: "Something went wrong!"
+			}
 		});
 	}
-};
+} 
 
 const profile = async (req, res) => {
 	const { errors, isValid } = validateProfileInput(req.body);
@@ -95,7 +96,7 @@ const profile = async (req, res) => {
 			success: false,
 			errors,
 		});
-	}
+	}	
 
 	const user = await userService.checkUsername(req.body.username);
 
@@ -125,7 +126,7 @@ const profile = async (req, res) => {
 			},
 		});
 	}
-};
+}; 
 
 const changePassword = async (req, res) => {
 	const { errors, isValid } = validateChangePasswordInput(req.body);
@@ -165,18 +166,18 @@ const changePassword = async (req, res) => {
 			},
 		});
 	}
-};
+}; 
 
-const me = async (req, res) => {
+const me = async (req,res) => {
 	try {
 		const { user } = await userService.getUser(req.user.id);
-
+	
 		res.json({
-			success: true,
-			data: {
-				user,
-			},
-		});
+			success:true,
+			data : {
+				user
+			}
+		})
 	} catch (error) {
 		return res.status(404).json({
 			success: false,
@@ -185,7 +186,7 @@ const me = async (req, res) => {
 			},
 		});
 	}
-};
+}
 
 module.exports = {
 	login,

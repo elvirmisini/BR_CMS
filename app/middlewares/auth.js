@@ -17,6 +17,7 @@ module.exports = (req,res,next) => {
 			name: decodedToken.name,
 			role: decodedToken.role,
 		}
+		
 		next();
 	} catch (error) {
 		return res.status(401).json({

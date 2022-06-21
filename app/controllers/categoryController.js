@@ -19,7 +19,7 @@ const all = async (req, res) => {
 			},
 		});
 	}
-};
+}; 
 
 const create = async (req, res) => {
 	const { errors, isValid } = validateCategoryInput(req.body);
@@ -48,7 +48,7 @@ const create = async (req, res) => {
 			},
 		});
 	}
-};
+}; 
 
 const update = async (req, res) => {
 	const { errors, isValid } = validateCategoryInput(req.body);
@@ -62,10 +62,10 @@ const update = async (req, res) => {
 
 	const getCategory = await categoryService.getBySlug(req.body.slug);
 
-	if (getCategory && getCategory.id != req.params.id) {
+	if(getCategory && getCategory.id != req.params.id){
 		return res.status(400).json({
 			success: false,
-			msg: 'Slug already exists!',
+			msg: "Slug already exists!",
 		});
 	}
 
@@ -86,32 +86,41 @@ const update = async (req, res) => {
 			},
 		});
 	}
-};
+}; 
 
 const deleteCategory = async (req, res) => {
 	try {
 		const { category } = await categoryService.deleteCategory(req.params.id);
-
+		
 		return res.json({
 			success: true,
 			data: {
-				msg: 'Deleted successfully!',
+				msg: "Deleted successfully!",
 				category,
 			},
 		});
 	} catch (e) {
-		return res.status(404).json({
+		if (e.message === 'Category not found!'){
+			return res.status(404).json({
+				success: false,
+				errors: {
+					msg: e.message,
+				},
+			});
+		}
+
+		return res.status(500).json({
 			success: false,
 			errors: {
-				msg: 'Category not found!',
+				msg: 'Something went wrong!',
 			},
 		});
 	}
-};
+}; 
 
 module.exports = {
 	all,
 	create,
 	update,
-	deleteCategory,
+	deleteCategory
 };
