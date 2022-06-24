@@ -30,7 +30,22 @@ const updateOrCreate = async (data) => {
 	);
 };
 
+const getLikesPerPost = async (post) => {
+	return await Reaction.find({
+		post,
+		liked: 1,
+	}).countDocuments();
+};
+
+const getFavoritesPerPost = async (post) => {
+	return await Reaction.find({
+		post,
+		favorite: 1,
+	}).countDocuments();
+};
 
 module.exports = {
 	updateOrCreate,
+	getLikesPerPost,
+	getFavoritesPerPost,
 };

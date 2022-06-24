@@ -8,6 +8,7 @@ const { mongoUri } = require('./const/config');
 const userRoutes  = require('./routes/user');
 const categoryRoutes = require('./routes/category');
 const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 const app = express();
 mongoose.connect(mongoUri, {
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use('/api', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 app.get("/", async (req, res) => {
 	res.json({
