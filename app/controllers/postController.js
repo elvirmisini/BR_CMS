@@ -15,7 +15,7 @@ const all = async (req, res) => {
 			},
 		});
 	} catch (e) {
-		console.log(e)
+		console.log(e);
 		return res.status(500).json({
 			success: false,
 			errors: {
@@ -23,7 +23,7 @@ const all = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
 const create = async (req, res) => {
 	const { errors, isValid } = validateCreatePostInput(req.body);
@@ -60,7 +60,7 @@ const create = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
 const update = async (req, res) => {
 	const { errors, isValid } = validateUpdatePostInput(req.body);
@@ -72,13 +72,13 @@ const update = async (req, res) => {
 		});
 	}
 
-	if(!(await postService.checkIfUserIsAuth(req.user,req.params.id))){
-			return res.status(401).json({
-				success: false,
-				errors: {
-					msg : "Unauthorizate!"
-				},
-			});
+	if (!(await postService.checkIfUserIsAuth(req.user, req.params.id))) {
+		return res.status(401).json({
+			success: false,
+			errors: {
+				msg: 'Unauthorizate!',
+			},
+		});
 	}
 
 	try {
@@ -107,14 +107,14 @@ const update = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
 const comment = async (req, res) => {
 	try {
 		const { post } = await postService.comment({
-			id: req.user.id, 
-			slug: req.params.slug, 
-			...req.body
+			id: req.user.id,
+			slug: req.params.slug,
+			...req.body,
 		});
 
 		return res.json({
@@ -132,16 +132,50 @@ const comment = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
-const like = async (req, res) => {
-	if(await postService.isNotAllowed(req.user,req.params.slug)){
-			return res.status(400).json({
+const commentReply = async (req, res) => {
+	try {
+		const { post } = await postService.commentReply({
+			id: req.user.id,
+			slug: req.params.slug,
+			commentId: req.params.commentId,
+			...req.body,
+		});
+
+		return res.json({
+			success: true,
+			data: {
+				post,
+			},
+		});
+	} catch (e) {
+		if (e.message === 'Comment not found!') {
+			return res.status(404).json({
 				success: false,
 				errors: {
-					msg : "You are not allowed!"
+					msg: e.message,
 				},
 			});
+		}
+
+		return res.status(500).json({
+			success: false,
+			errors: {
+				msg: 'Something went wrong!',
+			},
+		});
+	}
+};
+
+const like = async (req, res) => {
+	if (await postService.isNotAllowed(req.user, req.params.slug)) {
+		return res.status(400).json({
+			success: false,
+			errors: {
+				msg: 'You are not allowed!',
+			},
+		});
 	}
 
 	try {
@@ -154,7 +188,7 @@ const like = async (req, res) => {
 			},
 		});
 	} catch (e) {
-		console.log(e)
+		console.log(e);
 		return res.status(500).json({
 			success: false,
 			errors: {
@@ -162,7 +196,7 @@ const like = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
 const favorite = async (req, res) => {
 	if (await postService.isNotAllowed(req.user, req.params.slug)) {
@@ -192,10 +226,9 @@ const favorite = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
 const deletePost = async (req, res) => {
-
 	if (!(await postService.checkIfUserIsAuth(req.user, req.params.id))) {
 		return res.status(401).json({
 			success: false,
@@ -211,7 +244,7 @@ const deletePost = async (req, res) => {
 		return res.json({
 			success: true,
 			data: {
-				msg: "Deleted successfully!",
+				msg: 'Deleted successfully!',
 				post,
 			},
 		});
@@ -232,7 +265,7 @@ const deletePost = async (req, res) => {
 			},
 		});
 	}
-}; 
+};
 
 module.exports = {
 	all,
@@ -242,4 +275,5 @@ module.exports = {
 	update,
 	deletePost,
 	comment,
+	commentReply,
 };

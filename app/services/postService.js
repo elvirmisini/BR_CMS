@@ -1,48 +1,50 @@
-const slugify = require('slugify')
+const slugify = require('slugify');
 
-const {getCategoryOrFail} = require('./../services/categoryService');
+const { getCategoryOrFail } = require('./../services/categoryService');
 const reactionService = require('./../services/reactionService');
 const commentService = require('./../services/commentService');
 const Post = require('./../models/Post');
 
 const all = async (userRole) => {
-	const condition = userRole === 'admin' ? {} : {isPrivate : false};
+	const condition = userRole === 'admin' ? {} : { isPrivate: false };
 	const posts = await Post.find(condition);
 
-	return await Promise.all(posts.map(async (post) => {
-		console.log(await reactionService.getLikesPerPost(post._id));
-		return {
-			...post._doc,
-			comments: await commentService.getCommentsPerPost(post._id),
-			likes: await reactionService.getLikesPerPost(post._id),
-			favorites: await reactionService.getFavoritesPerPost(post._id),
-		};
-	}));
-}
+	return await Promise.all(
+		posts.map(async (post) => {
+			console.log(await reactionService.getLikesPerPost(post._id));
+			return {
+				...post._doc,
+				comments: await commentService.getCommentsPerPost(post._id),
+				likes: await reactionService.getLikesPerPost(post._id),
+				favorites: await reactionService.getFavoritesPerPost(post._id),
+			};
+		})
+	);
+};
 
 const create = async (userId, data) => {
-	const slug = slugify(data.title, "-");
+	const slug = slugify(data.title, '-');
 
 	const checkSlugResults = await searchBySlug(slug);
 
 	const category = await getCategoryOrFail(data.categoryId);
-	
+
 	const post = await new Post({
 		title: data.title,
 		description: data.description,
 		author: userId,
 		slug: checkSlugResults > 0 ? `${slug}-${checkSlugResults}` : slug,
-		category: category.id
+		category: category.id,
 	}).save();
 
 	return {
 		post,
 	};
-}
+};
 
 const update = async (id, data) => {
 	const category = await getCategoryOrFail(data.categoryId);
-	
+
 	const post = await Post.findOneAndUpdate(
 		{ _id: id },
 		{
@@ -57,10 +59,10 @@ const update = async (id, data) => {
 	return {
 		post,
 	};
-}
+};
 
 const comment = async (data) => {
-	const post = await Post.findOne({ slug : data.slug });
+	const post = await Post.findOne({ slug: data.slug });
 
 	await commentService.create({
 		userId: data.id,
@@ -73,22 +75,41 @@ const comment = async (data) => {
 	};
 };
 
-const like = async (userId, slug) => {
-	const post = await Post.findOne({slug});
+const commentReply = async (data) => {
+	const post = await Post.findOne({ slug: data.slug });
 
-	await reactionService.updateOrCreate({
-		userId,
+	if (!(await commentService.checkIfCommentExists(data.commentId, post.id))) {
+		throw new Error('Comment not found!');
+	}
+
+	await commentService.create({
+		userId: data.id,
 		postId: post.id,
-		liked: true
+		comment: data.comment,
+		parentCommentId: data.commentId,
 	});
 
 	return {
 		post,
 	};
-}
+};
+
+const like = async (userId, slug) => {
+	const post = await Post.findOne({ slug });
+
+	await reactionService.updateOrCreate({
+		userId,
+		postId: post.id,
+		liked: true,
+	});
+
+	return {
+		post,
+	};
+};
 
 const favorite = async (userId, slug) => {
-	const post = await Post.findOne({slug});
+	const post = await Post.findOne({ slug });
 
 	await reactionService.updateOrCreate({
 		userId,
@@ -99,7 +120,7 @@ const favorite = async (userId, slug) => {
 	return {
 		post,
 	};
-}
+};
 
 const deletePost = async (id) => {
 	const post = await Post.findById(id);
@@ -115,16 +136,16 @@ const deletePost = async (id) => {
 	};
 };
 
-const searchBySlug = async (slug) => { 
-	const searchInput = new RegExp(slug, "i");
+const searchBySlug = async (slug) => {
+	const searchInput = new RegExp(slug, 'i');
 	const searchedResults = await Post.find({
 		slug: {
 			$regex: searchInput,
 		},
 	});
 
-	return  searchedResults.length
-}
+	return searchedResults.length;
+};
 
 const getBySlug = async (slug) => {
 	return await Post.findOne({
@@ -133,17 +154,20 @@ const getBySlug = async (slug) => {
 };
 
 const checkIfUserIsAuth = async (user, id) => {
-	return user.role == 'admin' || await Post.findOne({
-		id,
-		author: user.id,
-	});
+	return (
+		user.role == 'admin' ||
+		(await Post.findOne({
+			id,
+			author: user.id,
+		}))
+	);
 };
 
 const isNotAllowed = async (user, slug) => {
-	return !!await Post.findOne({
+	return !!(await Post.findOne({
 		slug,
 		author: user.id,
-	});
+	}));
 };
 
 module.exports = {
@@ -156,5 +180,6 @@ module.exports = {
 	isNotAllowed,
 	favorite,
 	comment,
+	commentReply,
 	like,
 };
