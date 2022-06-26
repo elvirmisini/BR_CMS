@@ -11,9 +11,7 @@ const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 
 const app = express();
-mongoose.connect(mongoUri, {
-	useNewUrlParser:true
-});
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true});
 
 mongoose.connection.on("connected", () => {
 	console.log("Successfully connected DB");

@@ -29,7 +29,7 @@ const update = async (req, res) => {
 			},
 		});
 	} catch (e) {
-		console.log(e);
+		console.log(e)
 		if (e.message === 'Comment Not found!') {
 			return res.status(404).json({
 				success: false,
@@ -45,9 +45,68 @@ const update = async (req, res) => {
 			},
 		});
 	}
-};
+}; 
+
+const replyComment = async (req, res) => {
+	try {
+		const replyComment = await commentService.replyComment(
+			req.user.id,
+			req.params.id,
+			req.body.comment
+		);
+
+		return res.json({
+			success: true,
+			replyComment,
+		});
+	} catch (e) {
+		if (e.message === 'Parent comment not found!') {
+			return res.status(404).json({
+				success: false,
+				errors: {
+					msg: 'Comment to reply to was not found!',
+				},
+			});
+		}
+		console.log(e);
+		return res.status(500).json({
+			success: false,
+			errors: {
+				msg: 'Something went wrong!',
+			},
+		});
+	}
+}; 
+
+const getReplies = async (req, res) => {
+	try {
+		const replyComments = await commentService.getReplies(req.params.id);
+
+		return res.json({
+			success: true,
+			data : {replyComments},
+		});
+	} catch (e) {
+		if (e.message === 'Parent comment not found!') {
+			return res.status(404).json({
+				success: false,
+				errors: {
+					msg: 'Comment to reply to was not found!',
+				},
+			});
+		}
+		console.log(e);
+		return res.status(500).json({
+			success: false,
+			errors: {
+				msg: 'Something went wrong!',
+			},
+		});
+	}
+}; 
 
 const deleteComment = async (req, res) => {
+
 	if (!(await commentService.checkIfUserIsAuth(req.user, req.params.id))) {
 		return res.status(401).json({
 			success: false,
@@ -59,11 +118,11 @@ const deleteComment = async (req, res) => {
 
 	try {
 		const { comment } = await commentService.deleteComment(req.params.id);
-
+		
 		return res.json({
 			success: true,
 			data: {
-				msg: 'Deleted successfully!',
+				msg: "Deleted successfully!",
 				comment,
 			},
 		});
@@ -83,38 +142,11 @@ const deleteComment = async (req, res) => {
 			},
 		});
 	}
-};
-const getReplies = async (req, res) => {
-	try {
-		const replies = await commentService.getReplies(req.params.id);
-		if (!replies) {
-			return res.status(401).json({
-				success: false,
-				errors: {
-					msg: 'No replies found',
-				},
-			});
-		}
-
-		return res.json({
-			success: true,
-			data: {
-				msg: 'Success!',
-				replies,
-			},
-		});
-	} catch (e) {
-		return res.status(500).json({
-			success: false,
-			errors: {
-				msg: 'Something went wrong!',
-			},
-		});
-	}
-};
+}; 
 
 module.exports = {
 	update,
-	deleteComment,
 	getReplies,
+	replyComment,
+	deleteComment
 };

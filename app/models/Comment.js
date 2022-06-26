@@ -11,12 +11,15 @@ const CommentSchema = new mongoose.Schema({
 		required: true,
 		ref: 'posts',
 	},
-	comment: { type: String, required: true },
-	comment1: { type: String },
-	parentCommentId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'comments',
+	ancestors : {
+		type: [String],
+		default: []
 	},
+	parent: {
+		type: mongoose.Schema.Types.ObjectId,
+		default: null,
+	},
+	comment: { type: String, required: true },
 });
 
 module.exports = mongoose.model('comments', CommentSchema);

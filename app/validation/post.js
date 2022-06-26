@@ -1,10 +1,11 @@
 const Validator = require('validator');
 
 module.exports = {
-	validateCreatePostInput(data) {
+	validateCreatePostInput(data, file) {
 		data.title =  !! data.title ? data.title : '';
 		data.description =  !! data.description ? data.description : '';
 		data.categoryId =  !! data.categoryId ? data.categoryId : '';
+		data.file =  !! file ? file.filename : '';
 
 		let errors = {};
 		
@@ -18,6 +19,10 @@ module.exports = {
 		
 		if(Validator.isEmpty(data.categoryId)){
 			errors.categoryId = 'Category is required';
+		}
+		
+		if(Validator.isEmpty(data.file)){
+			errors.file = 'File is required';
 		}
 
 		return {
